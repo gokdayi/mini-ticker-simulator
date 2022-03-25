@@ -1,0 +1,27 @@
+{
+  "name": "boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap --reporter=list --watch",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "nodemon": "^2.0.15",
+    "pino-pretty": "^7.6.0",
+    "tap": "^16.0.1"
+  },
+  "dependencies": {
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0",
+    "fastify": "^3.27.4",
+    "mongoose": "^6.2.8",
+    "uuid": "^8.3.2",
+    "ws": "^7.5.7"
+  }
+}
