@@ -73,7 +73,89 @@ There are 2 routes;
 - /instruments/:symbol   [GET] 
 - /instruments/deleteall [DELETE]
 
+### API Usage Examples
 
-### CONCLUSION
+#### Fetching Instruments Data
+To fetch the instruments data, make a GET request to the following URL:
+```javascript
+http://localhost:3000/instruments/:symbol
+```
+Replace `:symbol` with the desired symbol (e.g., BTC, ETH, XRP).
+
+Example:
+```javascript
+http://localhost:3000/instruments/BTC
+```
+
+Expected Response:
+```json
+{
+  "data": [
+    {
+      "symbol": "BTC",
+      "createdOn": "2022-01-01T00:00:00.000Z",
+      "instType": "SPOT",
+      "instId": "BTC-USD",
+      "last": "50000",
+      "lastSz": "0.1",
+      "askPx": "50001",
+      "askSz": "0.2",
+      "bidPx": "49999",
+      "bidSz": "0.3",
+      "open24h": "48000",
+      "high24h": "51000",
+      "low24h": "47000",
+      "sodUtc0": "49000",
+      "sodUtc8": "49500",
+      "volCcy24h": "1000",
+      "vol24h": "200",
+      "ts": "1640995200000"
+    }
+  ]
+}
+```
+
+#### Deleting All Ticker Records
+To delete all ticker records from the database, make a DELETE request to the following URL:
+```javascript
+http://localhost:3000/instruments/deleteall
+```
+
+Expected Response:
+```json
+{
+  "message": "Deleted successfully! Total count => 100"
+}
+```
+
+### Error Handling
+In case of any errors, the API will return an error object with the appropriate status code and error message.
+
+Example:
+```json
+{
+  "error": "Instruments can not be null"
+}
+```
+
+### Contributing
+We welcome contributions to this project! To contribute, please follow these guidelines:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Make your changes and commit them with descriptive commit messages.
+4. Push your changes to your forked repository.
+5. Create a pull request to the main repository.
+
+### Submitting Issues
+If you encounter any issues or have any suggestions, please submit an issue on the GitHub repository. Provide as much detail as possible, including steps to reproduce the issue and any relevant screenshots or logs.
+
+### Pull Requests
+When submitting a pull request, please ensure that your changes do not break any existing functionality and that your code follows the project's coding standards. Include a detailed description of your changes and any relevant information.
+
+### Code Comments
+To improve code readability and maintainability, we have added comments to the code to explain the purpose of functions and important sections of the code. Please follow this practice when contributing to the project.
+
+### Conclusion
 
 This a project developed in a couple of hours for an interview, so it is not well-tested. It is also dependent on a public API by OKX (it doesn't require a key) but there are limitations and terms are subject to change anytime. So, DO NOT use this code for production! Do your own research with OKX API.
