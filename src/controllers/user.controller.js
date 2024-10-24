@@ -80,3 +80,61 @@ exports.deleteAccount = async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 };
+
+// Update user preferences
+exports.updatePreferences = async (req, res) => {
+  try {
+    const { preferences } = req.body;
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    user.preferences = preferences;
+    await user.save();
+    res.status(200).send({ message: 'Preferences updated successfully' });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+// Get user preferences
+exports.getPreferences = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    res.status(200).send({ preferences: user.preferences });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+// Update user notification settings
+exports.updateNotificationSettings = async (req, res) => {
+  try {
+    const { notificationSettings } = req.body;
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    user.notificationSettings = notificationSettings;
+    await user.save();
+    res.status(200).send({ message: 'Notification settings updated successfully' });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+// Get user notification settings
+exports.getNotificationSettings = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    res.status(200).send({ notificationSettings: user.notificationSettings });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};

@@ -31,3 +31,23 @@ function updateTable(data) {
     tableBody.appendChild(row);
   });
 }
+
+// Implement search functionality to filter cryptocurrencies based on user input
+document.getElementById('search-bar').addEventListener('input', function (event) {
+  const searchTerm = event.target.value.toLowerCase();
+  const rows = document.querySelectorAll('#crypto-table tbody tr');
+
+  rows.forEach((row) => {
+    const symbol = row.querySelector('td:first-child').textContent.toLowerCase();
+    if (symbol.includes(searchTerm)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+});
+
+// Implement dark mode toggle functionality
+document.getElementById('dark-mode-toggle').addEventListener('click', function () {
+  document.body.classList.toggle('dark-mode');
+});

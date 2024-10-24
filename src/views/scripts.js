@@ -51,4 +51,39 @@ document.addEventListener('DOMContentLoaded', () => {
   filterButton.addEventListener('click', updateChart);
 
   updateChart();
+  
+  // Handle user preferences and notification settings
+  const savePreferences = async (preferences) => {
+    const response = await fetch('/user/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(preferences)
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  const loadPreferences = async () => {
+    const response = await fetch('/user/preferences');
+    const data = await response.json();
+    return data;
+  };
+
+  const applyPreferences = (preferences) => {
+    if (preferences.darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    // Apply other preferences as needed
+  };
+
+  const initPreferences = async () => {
+    const preferences = await loadPreferences();
+    applyPreferences(preferences);
+  };
+
+  initPreferences();
 });

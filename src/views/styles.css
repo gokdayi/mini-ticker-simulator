@@ -5,6 +5,11 @@ body {
   padding: 0;
 }
 
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -53,4 +58,27 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+#search-bar {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+nav {
+  margin-top: 20px;
+  text-align: center;
+}
+
+nav a {
+  color: #007bff;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+nav a:hover {
+  text-decoration: underline;
 }
