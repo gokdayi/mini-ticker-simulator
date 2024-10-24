@@ -13,4 +13,8 @@ module.exports = app => {
   app.get('/cryptocurrencies', controller.getSupportedCryptocurrencies);
   app.post('/cryptocurrencies', controller.addSupportedCryptocurrency);
   app.delete('/cryptocurrencies/:symbol', controller.removeSupportedCryptocurrency);
-};
+	
+	app.get('/', async (req, res) => {
+		res.sendFile('index.html');
+	});
+}
