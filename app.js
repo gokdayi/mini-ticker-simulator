@@ -3,6 +3,8 @@ const { default: mongoose } = require('mongoose');
 const dotenv = require('dotenv');
 const WebSocket = require('ws');
 const { saveTickers } = require('./src/logic/ticker.repo');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -11,6 +13,31 @@ const fastify = require('fastify')({ logger: true });
 const wsUrl = 'wss://ws.okex.com:8443/ws/v5/public';
 
 require('./src/routes/instruments.route')(fastify);
+require('./src/routes/user.route')(fastify);
+
+// Middleware to authenticate JWT
+fastify.addHook('onRequest', async (request, reply) => {
+  if (request.url.startsWith('/user')) {
+    return;
+  }
+
+  const authHeader = request.headers['authorization'];
+  if (!authHeader) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    request.user = decoded;
+  } catch (error) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+});
 
 // Function to get instruments data from OKX API
 const getInstruments = async () => {
@@ -29,7 +56,7 @@ const getInstruments = async () => {
 
   const { data: instrumentsData } = data;
 
-  const validTickers = ['BTC', 'ETH', 'XRP'];
+  const validTickers = await getSupportedCryptocurrencies();
   const instruments = instrumentsData.filter(
     (p) => validTickers.indexOf(p.baseCcy) >= 0
   );
@@ -37,6 +64,14 @@ const getInstruments = async () => {
   return {
     instruments: instruments,
   };
+};
+
+// Function to get supported cryptocurrencies from configuration file
+const getSupportedCryptocurrencies = async () => {
+  const configFilePath = './src/config/supportedCryptocurrencies.json';
+  const configData = await fs.promises.readFile(configFilePath, 'utf-8');
+  const config = JSON.parse(configData);
+  return config.supportedCryptocurrencies;
 };
 
 // Function to connect to OKX WebSocket feed

@@ -156,6 +156,15 @@ When submitting a pull request, please ensure that your changes do not break any
 ### Code Comments
 To improve code readability and maintainability, we have added comments to the code to explain the purpose of functions and important sections of the code. Please follow this practice when contributing to the project.
 
+### Enhanced Data Visualization
+We have added a front-end interface to visualize the cryptocurrency ticker data in real-time. The interface uses charting libraries like Chart.js or D3.js to display historical data and trends. Users can filter data for specific time ranges or specific cryptocurrencies.
+
+### User Authentication and Authorization
+We have implemented user authentication using JWT (JSON Web Tokens) to secure the API endpoints. User roles and permissions have been added to control access to certain features, such as viewing or deleting data. An admin interface is available for managing user accounts and permissions.
+
+### Additional Cryptocurrency Support
+We have expanded the list of supported cryptocurrencies beyond BTC, ETH, and XRP. Users can specify which cryptocurrencies they want to track and subscribe to the corresponding WebSocket channels. A configuration file or database table is used to store the list of supported cryptocurrencies and their corresponding WebSocket channels.
+
 ### Conclusion
 
 This a project developed in a couple of hours for an interview, so it is not well-tested. It is also dependent on a public API by OKX (it doesn't require a key) but there are limitations and terms are subject to change anytime. So, DO NOT use this code for production! Do your own research with OKX API.
