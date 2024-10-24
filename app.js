@@ -12,6 +12,22 @@ const wsUrl = 'wss://ws.okex.com:8443/ws/v5/public';
 
 require('./src/routes/instruments.route')(fastify);
 
+// Serve static files from the 'public' directory
+fastify.register(require('fastify-static'), {
+  root: path.join(__dirname, 'public'),
+  prefix: '/public/',
+});
+
+// WebSocket endpoint for real-time updates
+fastify.register(require('fastify-websocket'), {
+  handle: (conn) => {
+    conn.pipe(conn); // echo the messages back
+  },
+  options: {
+    maxPayload: 1048576,
+  },
+});
+
 // Function to get instruments data from OKX API
 const getInstruments = async () => {
   const url = 'https://www.okx.com/api/v5/public/instruments?instType=SPOT';
