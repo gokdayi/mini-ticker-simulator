@@ -13,4 +13,7 @@ module.exports = app => {
   app.get('/user/preferences', userController.getPreferences);
   app.put('/user/notification-settings', userController.updateNotificationSettings);
   app.get('/user/notification-settings', userController.getNotificationSettings);
+
+  // User activity logs routes
+  app.get('/user/activity-logs', userController.getActivityLogs);
 };

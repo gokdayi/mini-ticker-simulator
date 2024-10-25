@@ -10,6 +10,7 @@ const Web3 = require('web3');
 const IPFS = require('ipfs-http-client');
 const Arweave = require('arweave');
 const crypto = require('crypto'); // P0208
+const logger = require('./src/logic/logger'); // P2200
 
 dotenv.config();
 
@@ -41,6 +42,19 @@ fastify.addHook('onRequest', async (request, reply) => {
     request.user = decoded;
   } catch (error) {
     return reply.status(401).send({ error: 'Unauthorized' });
+  }
+});
+
+// Middleware to log all user-related requests and responses
+fastify.addHook('onRequest', async (request, reply) => {
+  if (request.url.startsWith('/user')) {
+    logger.logRequest(request);
+  }
+});
+
+fastify.addHook('onResponse', async (request, reply) => {
+  if (request.url.startsWith('/user')) {
+    logger.logResponse(request, reply);
   }
 });
 
