@@ -168,3 +168,23 @@ We have expanded the list of supported cryptocurrencies beyond BTC, ETH, and XRP
 ### Conclusion
 
 This a project developed in a couple of hours for an interview, so it is not well-tested. It is also dependent on a public API by OKX (it doesn't require a key) but there are limitations and terms are subject to change anytime. So, DO NOT use this code for production! Do your own research with OKX API.
+
+### Improvements
+
+#### Code Quality and Structure
+- Add more comments and documentation to the code to improve readability and maintainability.
+- Refactor the code to follow best practices and design patterns, such as separating concerns and using dependency injection.
+- Add more unit tests and integration tests to ensure the code is well-tested and reliable.
+- Use a consistent coding style and enforce it with tools like ESLint and Prettier.
+
+#### Security and Authentication
+- Implement proper error handling and logging to improve security and debugging.
+- Use environment variables for sensitive information, such as API keys and database credentials, and store them in a secure location.
+- Implement user authentication and authorization to restrict access to certain features and endpoints.
+- Use HTTPS to encrypt data in transit and protect against man-in-the-middle attacks.
+
+#### Performance and Scalability
+- Optimize the code for performance, such as reducing the number of database queries and using caching where appropriate.
+- Use a load balancer and multiple instances of the server to handle high traffic and improve scalability.
+- Implement rate limiting and throttling to prevent abuse and ensure fair usage of the API.
+- Use a content delivery network (CDN) to serve static assets and improve load times.
