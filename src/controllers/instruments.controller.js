@@ -2,6 +2,7 @@ const { Ticker } = require('../models');
 const { getSupportedCryptocurrencies, addSupportedCryptocurrency, removeSupportedCryptocurrency } = require('../logic/cryptocurrency.repo');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const logger = require('../logic/logger');
 
 // Function to get the latest 10 ticker items for a given symbol
 exports.getinstruments = async (req, res) => {
@@ -10,6 +11,8 @@ exports.getinstruments = async (req, res) => {
     const data = await Ticker.find({ symbol: symbol })
       .sort({ createdOn: -1 })
       .limit(10);
+
+    logger.logActivity(req.user.userId, `Fetched instruments for symbol: ${symbol}`);
 
     return res.status(200).send({
       data,
@@ -34,6 +37,8 @@ exports.deleteall = async (req, res) => {
     if (!deleted) {
       return res.status(500).send({ message: 'Unexpected error!' });
     }
+
+    logger.logActivity(req.user.userId, 'Deleted all tickers');
 
     res.status(200).send({
       message: `Deleted successfully! Total count => ${deleted.deletedCount}`,
@@ -100,6 +105,7 @@ exports.addSupportedCryptocurrency = async (req, res) => {
   try {
     const { symbol } = req.body;
     await addSupportedCryptocurrency(symbol);
+    logger.logActivity(req.user.userId, `Added supported cryptocurrency: ${symbol}`);
     res.status(201).send({ message: 'Cryptocurrency added successfully' });
   } catch (error) {
     console.error('Error adding supported cryptocurrency:', error);
@@ -112,6 +118,7 @@ exports.removeSupportedCryptocurrency = async (req, res) => {
   try {
     const { symbol } = req.params;
     await removeSupportedCryptocurrency(symbol);
+    logger.logActivity(req.user.userId, `Removed supported cryptocurrency: ${symbol}`);
     res.status(200).send({ message: 'Cryptocurrency removed successfully' });
   } catch (error) {
     console.error('Error removing supported cryptocurrency:', error);

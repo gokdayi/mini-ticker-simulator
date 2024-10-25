@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     type: Object,
     default: {},
   },
+  activityLogs: {
+    type: [String],
+    default: [],
+  },
 });
 
 // Create the User model using the schema

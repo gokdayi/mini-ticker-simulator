@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const logger = require('../logic/logger');
 
 // User registration
 exports.register = async (req, res) => {
@@ -11,6 +12,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, password: hashedPassword });
     await user.save();
+    logger.logActivity(user._id, 'User registered');
     res.status(201).send({ message: 'User registered successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -38,6 +40,7 @@ exports.login = async (req, res) => {
       return res.status(401).send({ error: 'Invalid 2FA token' });
     }
     const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    logger.logActivity(user._id, 'User logged in');
     res.status(200).send({ token: jwtToken });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -55,6 +58,7 @@ exports.enable2FA = async (req, res) => {
     user.twoFactorSecret = secret.base32;
     await user.save();
     const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url);
+    logger.logActivity(user._id, '2FA enabled');
     res.status(200).send({ qrCodeUrl });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -77,6 +81,7 @@ exports.verify2FA = async (req, res) => {
     if (!isTokenValid) {
       return res.status(401).send({ error: 'Invalid 2FA token' });
     }
+    logger.logActivity(user._id, '2FA verified');
     res.status(200).send({ message: '2FA verified successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -111,6 +116,7 @@ exports.updateProfile = async (req, res) => {
       user.password = await bcrypt.hash(password, 10);
     }
     await user.save();
+    logger.logActivity(user._id, 'Profile updated');
     res.status(200).send({ message: 'Profile updated successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -124,6 +130,7 @@ exports.deleteAccount = async (req, res) => {
     if (!user) {
       return res.status(404).send({ error: 'User not found' });
     }
+    logger.logActivity(user._id, 'Account deleted');
     res.status(200).send({ message: 'Account deleted successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -140,6 +147,7 @@ exports.updatePreferences = async (req, res) => {
     }
     user.preferences = preferences;
     await user.save();
+    logger.logActivity(user._id, 'Preferences updated');
     res.status(200).send({ message: 'Preferences updated successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -169,6 +177,7 @@ exports.updateNotificationSettings = async (req, res) => {
     }
     user.notificationSettings = notificationSettings;
     await user.save();
+    logger.logActivity(user._id, 'Notification settings updated');
     res.status(200).send({ message: 'Notification settings updated successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
