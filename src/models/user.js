@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  permissions: {
+    type: [String],
+    default: [],
+  },
   preferences: {
     type: Object,
     default: {},

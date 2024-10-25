@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
 
 // User registration
 exports.register = async (req, res) => {
@@ -18,7 +20,7 @@ exports.register = async (req, res) => {
 // User login
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, token } = req.body;
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).send({ error: 'Invalid username or password' });
@@ -27,8 +29,55 @@ exports.login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).send({ error: 'Invalid username or password' });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).send({ token });
+    const isTokenValid = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token
+    });
+    if (!isTokenValid) {
+      return res.status(401).send({ error: 'Invalid 2FA token' });
+    }
+    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).send({ token: jwtToken });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+// Enable 2FA
+exports.enable2FA = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    const secret = speakeasy.generateSecret();
+    user.twoFactorSecret = secret.base32;
+    await user.save();
+    const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url);
+    res.status(200).send({ qrCodeUrl });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+// Verify 2FA
+exports.verify2FA = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+    const isTokenValid = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token
+    });
+    if (!isTokenValid) {
+      return res.status(401).send({ error: 'Invalid 2FA token' });
+    }
+    res.status(200).send({ message: '2FA verified successfully' });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
