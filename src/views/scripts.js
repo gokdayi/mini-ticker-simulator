@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cryptoSelect = document.getElementById('cryptoSelect');
   const timeRange = document.getElementById('timeRange');
   const filterButton = document.getElementById('filterButton');
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
 
   const chart = new Chart(ctx, {
     type: 'line',
@@ -86,4 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   initPreferences();
+
+  // Implement dark mode toggle functionality
+  darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const preferences = { darkMode: document.body.classList.contains('dark-mode') };
+    savePreferences(preferences);
+  });
 });
