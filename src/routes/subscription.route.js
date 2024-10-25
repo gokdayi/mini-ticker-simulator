@@ -3,6 +3,7 @@ const router = express.Router();
 const Subscription = require('../models/subscription');
 const User = require('../models/user');
 const { sendEmailNotification } = require('../logic/emailNotifications');
+const { createSubscription, cancelSubscription, updateSubscription } = require('../logic/paddle');
 
 // Route to get all subscription plans
 router.get('/plans', async (req, res) => {
@@ -26,6 +27,11 @@ router.post('/upgrade', async (req, res) => {
     const plan = await Subscription.findById(planId);
     if (!plan) {
       return res.status(404).json({ error: 'Subscription plan not found' });
+    }
+
+    const paddleResponse = await createSubscription(planId, user.email);
+    if (!paddleResponse.success) {
+      return res.status(500).json({ error: 'Failed to create subscription with Paddle' });
     }
 
     user.subscription = planId;
@@ -52,6 +58,11 @@ router.post('/downgrade', async (req, res) => {
     const plan = await Subscription.findById(planId);
     if (!plan) {
       return res.status(404).json({ error: 'Subscription plan not found' });
+    }
+
+    const paddleResponse = await updateSubscription(user.subscription, planId);
+    if (!paddleResponse.success) {
+      return res.status(500).json({ error: 'Failed to update subscription with Paddle' });
     }
 
     user.subscription = planId;
