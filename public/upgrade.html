@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upgrade Subscription</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Upgrade Your Subscription</h1>
+  <p>You have reached your subscription limits. Please upgrade your subscription to continue using our services.</p>
+  <div id="subscription-options">
+    <h2>Subscription Plans</h2>
+    <ul>
+      <li>
+        <h3>Free</h3>
+        <p>Track up to 3 currencies</p>
+        <p>Up to 5,000 API requests per day</p>
+      </li>
+      <li>
+        <h3>Premium</h3>
+        <p>Track up to 15 currencies</p>
+        <p>Up to 50,000 API requests per day</p>
+        <p>Price: $100/month</p>
+        <button onclick="upgradeSubscription('premium')">Upgrade to Premium</button>
+      </li>
+      <li>
+        <h3>Gold</h3>
+        <p>Track unlimited currencies</p>
+        <p>Up to 1,000,000 API requests per day</p>
+        <p>Price: $149/month</p>
+        <button onclick="upgradeSubscription('gold')">Upgrade to Gold</button>
+      </li>
+    </ul>
+  </div>
+  <script>
+    function upgradeSubscription(plan) {
+      // Implement the logic to upgrade the subscription plan
+      alert(`Upgrading to ${plan} plan`);
+    }
+  </script>
+</body>
+</html>

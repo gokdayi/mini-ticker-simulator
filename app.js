@@ -9,8 +9,10 @@ const path = require('path');
 const Web3 = require('web3');
 const IPFS = require('ipfs-http-client');
 const Arweave = require('arweave');
-const crypto = require('crypto'); // P0208
-const logger = require('./src/logic/logger'); // P2200
+const crypto = require('crypto');
+const logger = require('./src/logic/logger');
+const Subscription = require('./src/models/subscription');
+const User = require('./src/models/user');
 
 dotenv.config();
 
@@ -20,6 +22,7 @@ const wsUrl = 'wss://ws.okex.com:8443/ws/v5/public';
 
 require('./src/routes/instruments.route')(fastify);
 require('./src/routes/user.route')(fastify);
+require('./src/routes/subscription.route')(fastify);
 
 // Middleware to authenticate JWT
 fastify.addHook('onRequest', async (request, reply) => {
@@ -56,6 +59,30 @@ fastify.addHook('onResponse', async (request, reply) => {
   if (request.url.startsWith('/user')) {
     logger.logResponse(request, reply);
   }
+});
+
+// Middleware to check subscription limits
+fastify.addHook('onRequest', async (request, reply) => {
+  if (request.url.startsWith('/user') || request.url.startsWith('/subscription')) {
+    return;
+  }
+
+  const user = await User.findById(request.user.userId).populate('subscription');
+  if (!user) {
+    return reply.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const { subscription, apiRequests } = user;
+  if (!subscription) {
+    return reply.status(403).send({ error: 'No subscription plan found' });
+  }
+
+  if (apiRequests >= subscription.limits.apiRequests) {
+    return reply.status(429).send({ error: 'API request limit reached' });
+  }
+
+  user.apiRequests += 1;
+  await user.save();
 });
 
 // Serve static files from the 'public' directory
@@ -136,7 +163,6 @@ const connectToWebsocketFeed = (instIdList) => {
   ws.on('message', async function message(data) {
     console.log(data);
     saveTickers(data);
-    // P897d
     const parsedData = JSON.parse(data);
     const significantChange = parsedData.some(item => Math.abs(item.change24h) > 5);
     if (significantChange) {
@@ -265,7 +291,6 @@ const retrieveFromArweave = async (id) => {
   return transaction.get('data', { decode: true, string: true });
 };
 
-// P0208
 const encryptData = (data) => {
   const algorithm = 'aes-256-cbc';
   const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, 'salt', 32);
