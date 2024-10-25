@@ -32,6 +32,14 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  subscription: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subscription',
+  },
+  apiRequests: {
+    type: Number,
+    default: 0,
+  },
 });
 
 // Create the User model using the schema
