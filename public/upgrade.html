@@ -34,9 +34,26 @@
     </ul>
   </div>
   <script>
-    function upgradeSubscription(plan) {
-      // Implement the logic to upgrade the subscription plan
-      alert(`Upgrading to ${plan} plan`);
+    async function upgradeSubscription(plan) {
+      try {
+        const response = await fetch('/subscription/upgrade', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ plan }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upgrade subscription');
+        }
+
+        const data = await response.json();
+        alert(`Subscription upgraded to ${plan} plan successfully`);
+      } catch (error) {
+        console.error('Error upgrading subscription:', error);
+        alert('Failed to upgrade subscription');
+      }
     }
   </script>
 </body>
