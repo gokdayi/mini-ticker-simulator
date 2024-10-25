@@ -3,6 +3,7 @@ const { getSupportedCryptocurrencies, addSupportedCryptocurrency, removeSupporte
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+// Function to get the latest 10 ticker items for a given symbol
 exports.getinstruments = async (req, res) => {
   try {
     const { symbol } = req.params;
@@ -14,12 +15,14 @@ exports.getinstruments = async (req, res) => {
       data,
     });
   } catch (error) {
+    console.error('Error fetching instruments:', error);
     return res.status(500).send({
-      error: error,
+      error: 'Internal server error',
     });
   }
 };
 
+// Function to delete all ticker records from the database
 exports.deleteall = async (req, res) => {
   try {
     const foundOnes = await Ticker.find();
@@ -36,13 +39,16 @@ exports.deleteall = async (req, res) => {
       message: `Deleted successfully! Total count => ${deleted.deletedCount}`,
     });
   } catch (error) {
+    console.error('Error deleting all tickers:', error);
     return res.status(500).send({
-      error: error,
+      error: 'Internal server error',
     });
   }
 };
 
 // User authentication and authorization logic
+
+// Function to register a new user
 exports.register = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -51,10 +57,12 @@ exports.register = async (req, res) => {
     await user.save();
     res.status(201).send({ message: 'User registered successfully' });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    console.error('Error registering user:', error);
+    res.status(500).send({ error: 'Internal server error' });
   }
 };
 
+// Function to log in a user
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -69,36 +77,44 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).send({ token });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    console.error('Error logging in user:', error);
+    res.status(500).send({ error: 'Internal server error' });
   }
 };
 
 // Additional cryptocurrency support logic
+
+// Function to get the list of supported cryptocurrencies
 exports.getSupportedCryptocurrencies = async (req, res) => {
   try {
     const supportedCryptocurrencies = await getSupportedCryptocurrencies();
     res.status(200).send({ supportedCryptocurrencies });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    console.error('Error fetching supported cryptocurrencies:', error);
+    res.status(500).send({ error: 'Internal server error' });
   }
 };
 
+// Function to add a new supported cryptocurrency
 exports.addSupportedCryptocurrency = async (req, res) => {
   try {
     const { symbol } = req.body;
     await addSupportedCryptocurrency(symbol);
     res.status(201).send({ message: 'Cryptocurrency added successfully' });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    console.error('Error adding supported cryptocurrency:', error);
+    res.status(500).send({ error: 'Internal server error' });
   }
 };
 
+// Function to remove a supported cryptocurrency
 exports.removeSupportedCryptocurrency = async (req, res) => {
   try {
     const { symbol } = req.params;
     await removeSupportedCryptocurrency(symbol);
     res.status(200).send({ message: 'Cryptocurrency removed successfully' });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    console.error('Error removing supported cryptocurrency:', error);
+    res.status(500).send({ error: 'Internal server error' });
   }
 };

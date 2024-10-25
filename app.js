@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const { saveTickers } = require('./src/logic/ticker.repo');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const path = require('path');
 
 dotenv.config();
 
