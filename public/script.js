@@ -28,6 +28,18 @@ function updateTable(data) {
     volumeCell.textContent = item.volume;
     row.appendChild(volumeCell);
 
+    const marketCapCell = document.createElement('td');
+    marketCapCell.textContent = item.marketCap;
+    row.appendChild(marketCapCell);
+
+    const change24hCell = document.createElement('td');
+    change24hCell.textContent = item.change24h;
+    row.appendChild(change24hCell);
+
+    const tradingVolumeCell = document.createElement('td');
+    tradingVolumeCell.textContent = item.tradingVolume;
+    row.appendChild(tradingVolumeCell);
+
     tableBody.appendChild(row);
   });
 }
