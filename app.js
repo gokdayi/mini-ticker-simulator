@@ -9,6 +9,7 @@ const path = require('path');
 const Web3 = require('web3');
 const IPFS = require('ipfs-http-client');
 const Arweave = require('arweave');
+const crypto = require('crypto'); // P0208
 
 dotenv.config();
 
@@ -121,6 +122,16 @@ const connectToWebsocketFeed = (instIdList) => {
   ws.on('message', async function message(data) {
     console.log(data);
     saveTickers(data);
+    // P897d
+    const parsedData = JSON.parse(data);
+    const significantChange = parsedData.some(item => Math.abs(item.change24h) > 5);
+    if (significantChange) {
+      fastify.websocketServer.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ type: 'SIGNIFICANT_CHANGE', data: parsedData }));
+        }
+      });
+    }
   });
 };
 
@@ -238,6 +249,26 @@ const retrieveFromArweave = async (id) => {
 
   const transaction = await arweave.transactions.get(id);
   return transaction.get('data', { decode: true, string: true });
+};
+
+// P0208
+const encryptData = (data) => {
+  const algorithm = 'aes-256-cbc';
+  const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, 'salt', 32);
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return { iv: iv.toString('hex'), encryptedData: encrypted };
+};
+
+const decryptData = (encryptedData, iv) => {
+  const algorithm = 'aes-256-cbc';
+  const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, 'salt', 32);
+  const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
+  let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
 };
 
 connectToDb();

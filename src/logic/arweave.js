@@ -18,7 +18,21 @@ const retrieveFromArweave = async (id) => {
   return transaction.get('data', { decode: true, string: true });
 };
 
+// Function to get the status of a transaction
+const getTransactionStatus = async (id) => {
+  const status = await arweave.transactions.getStatus(id);
+  return status;
+};
+
+// Function to get the price of uploading data to Arweave
+const getPrice = async (data) => {
+  const price = await arweave.transactions.getPrice(data.length);
+  return price;
+};
+
 module.exports = {
   uploadToArweave,
   retrieveFromArweave,
+  getTransactionStatus,
+  getPrice,
 };

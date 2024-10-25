@@ -15,7 +15,21 @@ const retrieveFromIPFS = async (hash) => {
   return Buffer.concat(data).toString();
 };
 
+// Function to pin data to IPFS
+const pinToIPFS = async (hash) => {
+  const response = await ipfs.pin.add(hash);
+  return response;
+};
+
+// Function to unpin data from IPFS
+const unpinFromIPFS = async (hash) => {
+  const response = await ipfs.pin.rm(hash);
+  return response;
+};
+
 module.exports = {
   uploadToIPFS,
   retrieveFromIPFS,
+  pinToIPFS,
+  unpinFromIPFS,
 };
