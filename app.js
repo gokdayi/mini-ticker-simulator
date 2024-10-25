@@ -6,6 +6,9 @@ const { saveTickers } = require('./src/logic/ticker.repo');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
+const Web3 = require('web3');
+const IPFS = require('ipfs-http-client');
+const Arweave = require('arweave');
 
 dotenv.config();
 
@@ -157,6 +160,84 @@ const connectToDb = () => {
       console.log(err);
       process.exit(1);
     });
+};
+
+// Function to handle wallet authentication and transactions
+const handleWalletAuthentication = async (request, reply) => {
+  const { walletAddress, signature } = request.body;
+
+  // Verify the signature using the wallet address
+  const web3 = new Web3();
+  const message = 'Authenticate with your wallet';
+  const recoveredAddress = web3.eth.accounts.recover(message, signature);
+
+  if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+    return reply.status(401).send({ error: 'Invalid signature' });
+  }
+
+  // Generate a JWT token for the authenticated wallet
+  const token = jwt.sign({ walletAddress }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return reply.status(200).send({ token });
+};
+
+// Function to interact with the smart contract
+const interactWithSmartContract = async (request, reply) => {
+  const { contractAddress, abi, method, params } = request.body;
+
+  const web3 = new Web3(process.env.BLOCKCHAIN_PROVIDER_URL);
+  const contract = new web3.eth.Contract(abi, contractAddress);
+
+  try {
+    const result = await contract.methods[method](...params).call();
+    return reply.status(200).send({ result });
+  } catch (error) {
+    console.error('Error interacting with smart contract:', error);
+    return reply.status(500).send({ error: 'Internal server error' });
+  }
+};
+
+// Function to upload data to IPFS
+const uploadToIPFS = async (data) => {
+  const ipfs = IPFS.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
+  const { path } = await ipfs.add(data);
+  return path;
+};
+
+// Function to retrieve data from IPFS
+const retrieveFromIPFS = async (hash) => {
+  const ipfs = IPFS.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
+  const data = [];
+  for await (const chunk of ipfs.cat(hash)) {
+    data.push(chunk);
+  }
+  return Buffer.concat(data).toString();
+};
+
+// Function to upload data to Arweave
+const uploadToArweave = async (data) => {
+  const arweave = Arweave.init({
+    host: 'arweave.net',
+    port: 443,
+    protocol: 'https',
+  });
+
+  const transaction = await arweave.createTransaction({ data });
+  await arweave.transactions.sign(transaction);
+  await arweave.transactions.post(transaction);
+
+  return transaction.id;
+};
+
+// Function to retrieve data from Arweave
+const retrieveFromArweave = async (id) => {
+  const arweave = Arweave.init({
+    host: 'arweave.net',
+    port: 443,
+    protocol: 'https',
+  });
+
+  const transaction = await arweave.transactions.get(id);
+  return transaction.get('data', { decode: true, string: true });
 };
 
 connectToDb();

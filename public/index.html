@@ -10,6 +10,24 @@
   <h1>Crypto Prices</h1>
   <input type="text" id="search-bar" placeholder="Search for a cryptocurrency...">
   <button id="dark-mode-toggle">Toggle Dark Mode</button>
+  <button id="connect-wallet">Connect Wallet</button>
+  <div id="wallet-address"></div>
+  <div id="contract-interaction">
+    <input type="text" id="contract-address" placeholder="Contract Address">
+    <input type="text" id="contract-method" placeholder="Method">
+    <input type="text" id="contract-params" placeholder="Params (comma-separated)">
+    <button id="interact-contract">Interact with Contract</button>
+    <div id="contract-result"></div>
+  </div>
+  <div id="decentralized-storage">
+    <input type="file" id="upload-file">
+    <button id="upload-ipfs">Upload to IPFS</button>
+    <button id="upload-arweave">Upload to Arweave</button>
+    <input type="text" id="retrieve-hash" placeholder="Retrieve Hash">
+    <button id="retrieve-ipfs">Retrieve from IPFS</button>
+    <button id="retrieve-arweave">Retrieve from Arweave</button>
+    <div id="storage-result"></div>
+  </div>
   <table id="crypto-table">
     <thead>
       <tr>
